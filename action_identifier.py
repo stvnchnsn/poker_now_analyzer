@@ -4,7 +4,8 @@ class Action_identifier:
     '''inentifies what the action was for the self.entry and 
     other relevant parameters.'''
     def __init__(self,entry):
-        self.entry = self.entry
+        self.entry = entry
+        print(type(self),'ai')
     def requested_seat(self):
         if 'requested a seat' in self.entry:
             self.actor = self.entry.split('"')[1].split()[0]
@@ -57,7 +58,7 @@ class Action_identifier:
         if 'posts a' in self.entry:
             if 'small' in self.entry:
                 return True, 'small_blind',int(self.entry.split()[-1])
-            if 'big' in self.self.entry:
+            if 'big' in self.entry:
                 return True, 'big_blind',int(self.entry.split()[-1])
         else:
             return False
@@ -93,3 +94,30 @@ class Action_identifier:
             return True, 'river'
         else:
             return False
+    def pay_out(self):
+        if 'Uncalled bet' in self.entry:
+            self.actor = self.entry.split('"')[1].split()[0]
+            self.amount = self.entry.split()[3]
+            return True, 'uncalled bet',self.actor, self.amount
+        if 'collected ' in self.entry:
+            self.actor= self.entry.split('"')[1].split()[0]
+            self.amount = self.entry.split()[-3]
+            return True ,'collected', self.actor, self.amount
+        else:
+            return False
+
+            
+
+def main(filename = 'original_data/poker_now_log_4gcAQTnotvBq87RCX1oHXKvhM.csv'):
+    import game_compiler
+    i = 40
+    data = game_compiler.Game_Compiler(filename)
+    data = data.raw_log()
+    print(data.iloc[i,0])
+    entry = Action_identifier(entry = (data.iloc[i,0]))
+    
+    print(entry.pay_out()) 
+
+
+if __name__ == '__main__':
+    main()
