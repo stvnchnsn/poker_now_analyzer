@@ -21,15 +21,17 @@ class Action_identifier:
             return False
     def admin(self):
         if "The game's small blind was changed " in self.entry:
-            return True,'admin', 'small blind update'
+            return True,'admin', 'small blind update',0
         if "The game's big blind was changed " in self.entry:
-            return True, 'admin','big blind update'
+            return True, 'admin','big blind update',0
         if "-- starting hand " in self.entry:
             self.handnumber = self.entry.split('#')[1].split()[0]
-            return True,'start hand',self.handnumber
+            return True, 'admin','start hand',self.handnumber
         if "-- ending hand" in self.entry:
             self.handnumber = self.entry.split('#')[1].split()[0]
-            return True, 'end hand', self.handnumber
+            return True,'admin', 'end hand', self.handnumber
+        if "Dead Small Blind" in self.entry:
+            return True,'admin', 'dead small blind',0
         else:
             return False
     def joined_game(self):
@@ -56,10 +58,11 @@ class Action_identifier:
             return False
     def blinds(self):
         if 'posts a' in self.entry:
+            self.actor = self.entry.split('"')[1].split()[0]
             if 'small' in self.entry:
-                return True, 'small_blind',int(self.entry.split()[-1])
+                return True, self.actor ,'small_blind',int(self.entry.split()[-1])
             if 'big' in self.entry:
-                return True, 'big_blind',int(self.entry.split()[-1])
+                return True,self.actor , 'big_blind',int(self.entry.split()[-1])
         else:
             return False
     def player_action(self):
@@ -77,20 +80,50 @@ class Action_identifier:
             return True, 'checks',self.actor,self.amount
         if 'bets' in self.entry:
             self.actor = self.entry.split('"')[1].split()[0]
-            self.amount = self.entry.split()[-1]
-            return True, 'bets', self.actor, self.amount
+            if 'go all in' in self.entry:
+                self.amount = self.entry.split()[-5]
+                return True, 'bets all in', self.actor, self.amount
+            else:
+                self.amount = self.entry.split()[-1]
+                return True, 'bets', self.actor, self.amount
         if 'raises' in self.entry:
             self.actor = self.entry.split('"')[1].split()[0]
             self.amount = self.entry.split()[-1]
             return True, 'raises', self.actor, self.amount
+        if 'shows' in self.entry:
+            self.actor = self.entry.split('"')[1].split()[0]
+            return True, 'shows', self.actor, self.amount  
+        if 'stand up' in self.entry:
+            self.actor = self.entry.split('"')[1].split()[0] 
+            return True, 'stand up', self.actor, self.amount
+        if 'sit down' in self.entry:
+            self.actor = self.entry.split('"')[1].split()[0] 
+            return True, 'sit down', self. actor, self.amount
+        if 'sit back' in self.entry:
+            self.actor = self.entry.split('"')[1].split()[0]
+            self.amount = self.entry.split()[-1]
+            return True, 'sit back', self.actor, self.amount
+        if 'quits the game' in self.entry:
+            self.actor = self.entry.split('"')[1].split()[0]
+            self.amount = self.entry.split()[-1]
+            return True, 'quits the game', self.actor, self.amount
+        if 'WARNING: the admin queued' in self.entry:
+            self.actor = self.entry.split('"')[1].split()[0]
+            self.amount = self.entry.split()[-6]
+            return True, 'admin approved stack upate',self.actor, self.amount
+        if 'The admin updated the player' in self.entry:
+            self.actor = self.entry.split('"')[1].split()[0]
+            self.amount = self.entry.split()[-1]
+            return True, 'stack update', self.actor, self.amount
+                
         else:
             return False
     def card_reveal(self):
-        if 'Flop' in self.entry:
+        if 'flop' in self.entry.lower():
             return True, 'flop'
-        if 'Turn:' in self.entry:
+        if 'turn:' in self.entry.lower():
             return True, 'turn'
-        if 'River:' in self.entry:
+        if 'river:' in self.entry.lower():
             return True, 'river'
         else:
             return False
@@ -101,7 +134,7 @@ class Action_identifier:
             return True, 'uncalled bet',self.actor, self.amount
         if 'collected ' in self.entry:
             self.actor= self.entry.split('"')[1].split()[0]
-            self.amount = self.entry.split()[-3]
+            self.amount = self.entry.split('from')[0].split()[-1]
             return True ,'collected', self.actor, self.amount
         else:
             return False
