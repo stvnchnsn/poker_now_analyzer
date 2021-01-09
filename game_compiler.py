@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 from word_soup import Word_Soup as ws
+from players import Player
 
 class Game_Compiler:
     '''Runs the entire game through word soup and outputs
@@ -30,13 +31,26 @@ class Game_Compiler:
         return  (f_time - i_time)
     def list_of_player(self):
         self.read_log()
-        self.players = (self.c_data['player'][(self.c_data['player'] != 'admin') &
+        self.player_list = (self.c_data['player'][(self.c_data['player'] != 'admin') &
         self.c_data['player']!= 0]).unique()
-        return self.players
+        return self.player_list
     def analyze_game(self):
         self.read_log()
-        self.list_of_player()
-        pass
+        ### Create actual player objects
+        self.players_objects = [] 
+        for player in self.player_list:
+            p = Player(player)
+            self.players_objects.append(p.name_of_player())
+        # create columns for players
+        for player in self.player_list:
+            self.c_data[player] = ''
+        # All the actions that affect the purse
+        # ['buy-in approved','big_blind','small_blind','calls','bets','uncalled bet','collected','bets all in','raises']
+        
+
+        
+        return self.c_data
+
 
 
 
@@ -44,14 +58,17 @@ class Game_Compiler:
 
 nov2020 = 'poker_now_log_QG7YmhhsY1elwfGITlbPZTOgY.csv'
 dec2020 = 'poker_now_log_4gcAQTnotvBq87RCX1oHXKvhM.csv'
-def main(filename = 'original_data/'+nov2020):
+def main(filename = 'original_data/'+dec2020):
     data = Game_Compiler(filename)
     log = data.read_log()
+    log.to_clipboard()
     duration = data.duration_of_game()
     print('duration = ', duration)
     players = data.list_of_player()
     print('players = ', players)
-    log.to_clipboard()
+    updatedlist = data.analyze_game()
+    updatedlist.to_clipboard()
+    
     
 if __name__ == '__main__':
     main()
