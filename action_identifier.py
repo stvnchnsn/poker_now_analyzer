@@ -15,8 +15,8 @@ class Action_identifier:
     def buyin_approve(self):
         if 'The admin approved the player' in self.entry:
             self.actor = self.entry.split('"')[1].split()[0]
-            self.stack = int(self.entry.strip('.').split()[-1])
-            return True, self.actor,'buy-in approved',self.stack
+            self.amount = int(self.entry.strip('.').split()[-1])
+            return True, self.actor,'buy-in approved',self.amount
         else:
             return False
     def admin(self):
@@ -46,7 +46,7 @@ class Action_identifier:
             self.player_s = {}
             for player in self.entry.split('|'):
                 self.actor = player.split('"')[1].split()[0]
-                self.stack = int(self.entry.strip('.').split()[-1].strip('()'))
+                self.stack = int(player.strip('.').split()[-1].strip('()'))
                 self.player_s[self.actor] = self.stack
             return True, 'player_stacks',self.player_s
         else:
@@ -73,8 +73,12 @@ class Action_identifier:
             return True, "fold", self.actor,self.amount
         elif 'calls' in self.entry:
             self.actor = self.entry.split('"')[1].split()[0]
-            self.amount = self.entry.split()[-1]
-            return True, 'calls', self.actor, self.amount
+            if 'go all in' in self.entry:
+                self.amount = self.entry.split()[-5]
+                return True, 'bets all in', self.actor,self.amount
+            else:
+                self.amount = self.entry.split()[-1]
+                return True, 'calls', self.actor, self.amount
         elif 'checks' in self.entry:
             self.actor = self.entry.split('"')[1].split()[0]
             return True, 'checks',self.actor,self.amount
@@ -88,8 +92,12 @@ class Action_identifier:
                 return True, 'bets', self.actor, self.amount
         if 'raises' in self.entry:
             self.actor = self.entry.split('"')[1].split()[0]
-            self.amount = self.entry.split()[-1]
-            return True, 'raises', self.actor, self.amount
+            if 'go all in' in self.entry:
+                self.amount = self.entry.split()[-5]
+                return True, 'bets all in', self.actor, self.amount
+            else:
+                self.amount = self.entry.split()[-1]
+                return True, 'raises', self.actor, self.amount
         if 'shows' in self.entry:
             self.actor = self.entry.split('"')[1].split()[0]
             return True, 'shows', self.actor, self.amount  

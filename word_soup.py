@@ -24,7 +24,7 @@ class Word_Soup:
         if action_id.requested_seat(self.entry):
             self.ans,self.actor,self.action = action_id.requested_seat(self.entry)    
         if action_id.buyin_approve(self.entry):
-            self.ans,self.actor,self.action,self.stack = action_id.buyin_approve(self.entry)
+            self.ans,self.actor,self.action,self.amount = action_id.buyin_approve(self.entry)
         if action_id.admin(self.entry):
             self.ans,self.actor,self.action,self.handnumber = action_id.admin(self.entry)
         if action_id.joined_game(self.entry):
@@ -34,7 +34,7 @@ class Word_Soup:
         if action_id.your_hand(self.entry):
             self.ans,self.action = action_id.your_hand(self.entry)
         if action_id.blinds(self.entry):
-            self.ans,self.actor,self.action,self.blind = action_id.blinds(self.entry)
+            self.ans,self.actor,self.action,self.amount = action_id.blinds(self.entry)
         if action_id.player_action(self.entry):
             self.ans,self.action,self.actor,self.amount = action_id.player_action(self.entry)
         if action_id.card_reveal(self.entry):
