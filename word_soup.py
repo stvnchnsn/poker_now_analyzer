@@ -9,6 +9,8 @@ class Word_Soup:
     def __init__(self, entry):
         self.entry = entry
 
+
+
     def entry_analyzer(self):
         '''analyzes an self.entry and returns:
         self.action, self.actor, stack, self.player_s, handnumber'''
@@ -16,7 +18,7 @@ class Word_Soup:
         self.actor = 0
         self.stack = 0
         self.player_s = 0
-        self.handnumber = 0
+        self.hand_num = 0
         self.small_b = 0
         self.blind = 0
         self.amount= 0
@@ -26,7 +28,7 @@ class Word_Soup:
         if action_id.buyin_approve(self.entry):
             self.ans,self.actor,self.action,self.amount = action_id.buyin_approve(self.entry)
         if action_id.admin(self.entry):
-            self.ans,self.actor,self.action,self.handnumber = action_id.admin(self.entry)
+            self.ans,self.actor,self.action,self.hand_num = action_id.admin(self.entry)
         if action_id.joined_game(self.entry):
             self.ans,self.action, self.actor,self.stack = action_id.joined_game(self.entry)
         if action_id.player_stacks(self.entry):
@@ -44,7 +46,7 @@ class Word_Soup:
 
         if self.ans == False:
             return ["action not defined",0,0,0,0,0,0]
-        return self.action, self.actor, self.amount,self.stack, self.player_s,self.handnumber,self.blind
+        return self.action, self.actor, self.amount,self.stack, self.player_s,self.hand_num,self.blind
 
 def main(filename = 'original_data/poker_now_log_4gcAQTnotvBq87RCX1oHXKvhM.csv'):
     import game_compiler

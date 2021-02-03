@@ -26,6 +26,7 @@ class Game_Compiler:
         self.c_data = pd.DataFrame(self.list_of_cleaned_entries, columns=self.cols)
         self.c_data['entries'] = self.r_data.iloc[:,0]
         self.c_data['at'] = self.r_data.iloc[:,1]
+
         return self.c_data
     def duration_of_game(self):
         i_time = pd.to_datetime(self.c_data['at'].iloc[0])
@@ -184,10 +185,43 @@ class Game_Compiler:
             for player in self.player_obj_list:
                 self.c_data.loc[i,player.name_of_player()]=player.purse
                 self.c_data.loc[i,'betting status'] = self.betting_status
-        return self.c_data
-                    
+        return self.c_data 
+
+    def simple_analyizer(self):
+        ''' use the log from read log to generate a simple 
+        time series of normalized stacks'''
+        self.read_log()
+        self.list_of_player()
+        self.hand_num = 0
+        self.pl_buy_in = {}
+        for p in self.player_list:
+            self.pl_buy_in[p] = 0 
+        
+        for i, l in enumerate(self.c_data['action']):
+            if int(self.c_data.loc[i,'Hand #'])>int(self.hand_num):
+                self.hand_num = self.c_data.loc[i,'Hand #']
+            elif l == 'buy-in approved':
+                self.player = self.c_data.loc[i,'player']
+                self.pl_buy_in[self.player] += self.c_data.loc[i,'amount']
+                #self.c_data.loc[i,self.player] = self.pl_buy_in[self.player]
+                
+            
+            elif l == 'player_stacks':
+                for k,v in self.c_data.loc[i,'player running stack'].items():
+                    self.c_data.loc[i,k] = v / self.pl_buy_in[k]
+                    print(self.c_data.loc[i,k])
+
+                
+
+                
 
 
+            self.c_data.loc[i,'hand_num'] = self.hand_num
+        
+        self.simple_log = self.c_data[(self.c_data['action'] == 'buy-in approved') |
+        (self.c_data['action'] == 'player_stacks')]
+        self.simple_log.to_clipboard()
+        
 
 
 
@@ -222,7 +256,19 @@ def test2_main(filename = 'original_data/'+dec2020):
     data = Game_Compiler(filename)
     analyzed_game = data.analyze_by_action()
     analyzed_game.to_clipboard()
+
+def test_read_log():
+    game =Game_Compiler(filename = 'original_data/'+dec2020)
+    game_read = game.read_log()
+    game_read.to_clipboard()
+def test_simple_analyizer():
+    game =Game_Compiler(filename = 'original_data/'+dec2020)
+    game_analyize = game.simple_analyizer()
+
+
 if __name__ == '__main__':
     #main()
     #test_main()
-    test2_main()
+    #test2_main()
+    #test_read_log()
+    test_simple_analyizer()
